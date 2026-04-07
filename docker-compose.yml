@@ -1,0 +1,7 @@
+services:
+  cv-similarity-api:
+    build: .
+    container_name: cv_similarity_api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

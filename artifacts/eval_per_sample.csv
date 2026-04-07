@@ -1,0 +1,7 @@
+sample_id,expected_top1_job_id,predicted_top1_job_id,top_score,top_label
+cv-ground-ops,et-ground-001,et-ground-001,0.262857,medium
+cv-cabin-service,et-cabin-001,et-cabin-001,0.193242,bad
+cv-mechanic-track,et-mech-001,et-mech-001,0.280176,medium
+cv-avionics-track,et-avionics-001,et-avionics-001,0.266939,medium
+cv-finance-track,et-finance-001,et-finance-001,0.214378,medium
+cv-pilot-support,et-pilot-001,et-pilot-001,0.343255,medium

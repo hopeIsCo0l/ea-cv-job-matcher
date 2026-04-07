@@ -1,0 +1,118 @@
+{
+  "scorer_source": "baseline_tfidf_cosine_v1",
+  "num_samples": 6,
+  "metrics": {
+    "top1_accuracy": 1.0,
+    "top3_hit_rate": 1.0,
+    "mrr": 1.0,
+    "threshold_sanity": {
+      "good": 0,
+      "medium": 5,
+      "bad": 1
+    }
+  },
+  "per_sample": [
+    {
+      "sample_id": "cv-ground-ops",
+      "expected_top1_job_id": "et-ground-001",
+      "predicted_top1_job_id": "et-ground-001",
+      "predicted_ranking": [
+        "et-ground-001",
+        "et-cs-001",
+        "et-pilot-001",
+        "et-avionics-001",
+        "et-cabin-001",
+        "et-finance-001",
+        "et-mech-001",
+        "et-power-001"
+      ],
+      "top_score": 0.262857,
+      "top_label": "medium"
+    },
+    {
+      "sample_id": "cv-cabin-service",
+      "expected_top1_job_id": "et-cabin-001",
+      "predicted_top1_job_id": "et-cabin-001",
+      "predicted_ranking": [
+        "et-cabin-001",
+        "et-cs-001",
+        "et-pilot-001",
+        "et-finance-001",
+        "et-ground-001",
+        "et-power-001",
+        "et-avionics-001",
+        "et-mech-001"
+      ],
+      "top_score": 0.193242,
+      "top_label": "bad"
+    },
+    {
+      "sample_id": "cv-mechanic-track",
+      "expected_top1_job_id": "et-mech-001",
+      "predicted_top1_job_id": "et-mech-001",
+      "predicted_ranking": [
+        "et-mech-001",
+        "et-power-001",
+        "et-avionics-001",
+        "et-cabin-001",
+        "et-cs-001",
+        "et-finance-001",
+        "et-ground-001",
+        "et-pilot-001"
+      ],
+      "top_score": 0.280176,
+      "top_label": "medium"
+    },
+    {
+      "sample_id": "cv-avionics-track",
+      "expected_top1_job_id": "et-avionics-001",
+      "predicted_top1_job_id": "et-avionics-001",
+      "predicted_ranking": [
+        "et-avionics-001",
+        "et-finance-001",
+        "et-cabin-001",
+        "et-cs-001",
+        "et-ground-001",
+        "et-mech-001",
+        "et-pilot-001",
+        "et-power-001"
+      ],
+      "top_score": 0.266939,
+      "top_label": "medium"
+    },
+    {
+      "sample_id": "cv-finance-track",
+      "expected_top1_job_id": "et-finance-001",
+      "predicted_top1_job_id": "et-finance-001",
+      "predicted_ranking": [
+        "et-finance-001",
+        "et-cs-001",
+        "et-cabin-001",
+        "et-avionics-001",
+        "et-ground-001",
+        "et-mech-001",
+        "et-pilot-001",
+        "et-power-001"
+      ],
+      "top_score": 0.214378,
+      "top_label": "medium"
+    },
+    {
+      "sample_id": "cv-pilot-support",
+      "expected_top1_job_id": "et-pilot-001",
+      "predicted_top1_job_id": "et-pilot-001",
+      "predicted_ranking": [
+        "et-pilot-001",
+        "et-cs-001",
+        "et-ground-001",
+        "et-avionics-001",
+        "et-cabin-001",
+        "et-finance-001",
+        "et-mech-001",
+        "et-power-001"
+      ],
+      "top_score": 0.343255,
+      "top_label": "medium"
+    }
+  ]
+}
