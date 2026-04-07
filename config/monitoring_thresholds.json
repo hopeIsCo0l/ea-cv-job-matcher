@@ -1,0 +1,33 @@
+{
+  "version": "1",
+  "description": "Phase 6 — alert and retraining policy thresholds. Tune per environment; version bumps require review.",
+  "latency_ms": {
+    "p95_warn": 2500,
+    "p95_critical": 5000,
+    "window_minutes": 15
+  },
+  "error_rate": {
+    "http_5xx_fraction_warn": 0.01,
+    "http_5xx_fraction_critical": 0.05,
+    "window_minutes": 15
+  },
+  "fallback_rate": {
+    "fraction_warn": 0.02,
+    "fraction_critical": 0.1,
+    "window_minutes": 60,
+    "notes": "Fraction of responses with serving_backend=fallback or scorer_source=fallback_unavailable"
+  },
+  "drift_and_quality": {
+    "description": "Proxy signals until live labels exist; replace with production metrics when available.",
+    "label_coverage_drop_warn_pp": 5,
+    "top1_vs_baseline_drop_warn": 0.05,
+    "eval_dataset_version": "v1",
+    "recompute_eval_script": "scripts/run_phase3_comparison.py"
+  },
+  "retraining_triggers": {
+    "any_critical_threshold_breached": true,
+    "fallback_rate_critical_consecutive_windows": 2,
+    "scheduled_eval_failure": true,
+    "manual_ticket_required": true
+  }
+}

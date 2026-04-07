@@ -48,8 +48,10 @@ When using **this** service with `FALLBACK_ON_ERROR=true`, the API sets **`fallb
 ## Phase 6 — recruitment app (e.g. fypimp103)
 
 - Point the main app at this service: **`REMOTE_SCORER_URL`**, client timeouts, and propagate **`request_id`** end-to-end if used for tracing.
-- Track **remote error rate**, **p95 latency**, and **fallback rate** (logs or a small dashboard).
-- On each release tag: re-run **`python scripts/run_phase3_comparison.py`** and **`python scripts/validate_registry.py`** (see `docs/phase6-roadmap.md`).
+- Track **remote error rate**, **p95 latency**, and **fallback rate**; align alert thresholds with **`config/monitoring_thresholds.json`** and panel layout in **`docs/phase6-monitoring-dashboard-spec.md`**.
+- **Periodic regression:** `python scripts/run_periodic_eval.py` (Phase 2 pipeline → registry validation → Phase 3 comparison; outputs under `artifacts/periodic_eval_<timestamp>/`). Alternatively run `run_phase3_comparison.py` and `validate_registry.py` individually (see `docs/phase6-roadmap.md`).
+- **Audit export:** `python scripts/export_audit_package.py` (optional `--no-dataset`); see **`docs/phase6-audit-package.md`**.
+- **Retraining / escalation:** **`docs/phase6-retraining-workflow.md`** (policy triggers, not auto-training in this repo).
 
 ## Example Request
 ```json

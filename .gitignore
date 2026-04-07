@@ -5,3 +5,7 @@ __pycache__/
 *.pyo
 *.pyd
 *.egg-info/
+
+# Phase 6 generated exports (local / CI artifacts)
+artifacts/audit_export_*/
+artifacts/periodic_eval_*/

@@ -104,11 +104,16 @@ curl -X POST "http://localhost:8000/v1/score" \
 ### Phase 5 — production serving + rollout
 - **Registry at runtime:** `GET /ready` and `POST /v1/score` expose `model_id`, `model_version`, `scorer_source` from `registry/`, plus `rollout_mode` and `serving_backend`.
 - **Env:** `SERVING_BACKEND`, `REMOTE_SCORER_URL`, `ROLLOUT_MODE` (`production` \| `shadow` \| `canary` \| `percentage`), `CANARY_PERCENT`, `FALLBACK_ON_ERROR`, `LOG_LEVEL` — see `docs/deployment-guide.md`.
-- **Observability:** logs `request_id`, `scorer_source`, `latency_ms`, rollout fields (Phase 6 can add dashboards).
+- **Observability:** logs `request_id`, `scorer_source`, `latency_ms`, rollout fields; Phase 6 ties these to dashboards and alerts.
 - **Docs:** `docs/deployment-guide.md`, `docs/rollback-runbook.md`, `docs/sla-slo.md`.
 
-### Phase 6 (integration + monitoring)
-- See `docs/phase6-roadmap.md` and **Phase 6** in `docs/integration-guide.md` (recruitment app, `request_id`, regression checks).
+### Phase 6 — monitoring, retraining loop, audit
+- **Roadmap / wiring:** `docs/phase6-roadmap.md`, **Phase 6** in `docs/integration-guide.md`.
+- **Dashboard spec (panels, log fields, alerts):** `docs/phase6-monitoring-dashboard-spec.md`.
+- **Retraining workflow (triggers, roles, steps):** `docs/phase6-retraining-workflow.md`.
+- **Audit bundle (contents + checklist):** `docs/phase6-audit-package.md`.
+- **Policy thresholds (latency, errors, fallback, drift proxies):** `config/monitoring_thresholds.json`.
+- **Scripts:** `python scripts/run_periodic_eval.py` (eval + registry validation + `artifacts/periodic_eval_<timestamp>/`); `python scripts/export_audit_package.py` (audit export; use `--no-dataset` to omit the JSONL).
 
 ## Phase 3 roadmap (not implemented)
 - Collect real labeled hiring outcomes and human ranking judgments
