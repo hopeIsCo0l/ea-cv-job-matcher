@@ -50,9 +50,16 @@
   "excluded_jobs": [
     {"job_id": "x", "reason": "non-ethiopian"}
   ],
-  "latency_ms": 7.2
+  "latency_ms": 7.2,
+  "model_id": "baseline_tfidf_cosine_v1",
+  "model_version": "v1.0.0-phase1-baseline",
+  "rollout_mode": "production",
+  "serving_backend": "local",
+  "fallback_reason": null
 }
 ```
+
+Optional fields may be `null`. When remote scoring fails and fallback applies, `scorer_source` may be `fallback_unavailable`, `ranked_results` empty, and `fallback_reason` set (Phase 5).
 
 ### Error Response
 ```json
@@ -64,4 +71,4 @@
 
 ## Health Endpoints
 - `GET /health` -> `{ "status": "ok" }`
-- `GET /ready` -> `{ "status": "ready", "scorer_source": "baseline_tfidf_cosine_v1" }`
+- `GET /ready` -> readiness plus registry metadata, e.g. `{ "status": "ready", "scorer_source": "...", "release_tag": "...", "model_id": "...", "model_version": "...", "rollout_mode": "production", "serving_backend": "local", "registry_path": "registry/registry.json" }`

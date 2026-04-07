@@ -101,6 +101,12 @@ curl -X POST "http://localhost:8000/v1/score" \
 - **Model cards:** `registry/model_cards/*.json` — schema: `registry/model_card.schema.json`.
 - **Validate:** `python scripts/validate_registry.py`
 
+### Phase 5 — production serving + rollout
+- **Registry at runtime:** `GET /ready` and `POST /v1/score` expose `model_id`, `model_version`, `scorer_source` from `registry/`, plus `rollout_mode` and `serving_backend`.
+- **Env:** `SERVING_BACKEND`, `REMOTE_SCORER_URL`, `ROLLOUT_MODE` (`production` \| `shadow` \| `canary` \| `percentage`), `CANARY_PERCENT`, `FALLBACK_ON_ERROR`, `LOG_LEVEL` — see `docs/deployment-guide.md`.
+- **Observability:** logs `request_id`, `scorer_source`, `latency_ms`, rollout fields (Phase 6 can add dashboards).
+- **Docs:** `docs/deployment-guide.md`, `docs/rollback-runbook.md`, `docs/sla-slo.md`.
+
 ## Phase 3 roadmap (not implemented)
 - Collect real labeled hiring outcomes and human ranking judgments
 - Train and compare transformer/reranker models

@@ -9,6 +9,9 @@
 ## Docker
 - Build and run: `docker compose up --build`
 - Stop: `docker compose down`
+- Production-style config, rollout env vars, health checks: `docs/deployment-guide.md`
+- Rollback: `docs/rollback-runbook.md`
+- SLO starter: `docs/sla-slo.md`
 
 ## Evaluation Workflow
 1. Generate synthetic dataset: `python scripts/generate_synthetic_data.py`

@@ -26,7 +26,11 @@ def test_health_and_ready():
     assert client.get("/health").status_code == 200
     ready = client.get("/ready")
     assert ready.status_code == 200
-    assert ready.json()["status"] == "ready"
+    body = ready.json()
+    assert body["status"] == "ready"
+    assert "model_version" in body
+    assert "rollout_mode" in body
+    assert "serving_backend" in body
 
 
 def test_score_response_schema():
@@ -44,6 +48,8 @@ def test_score_response_schema():
     assert data["scorer_source"] == "baseline_tfidf_cosine_v1"
     assert isinstance(data["ranked_results"], list)
     assert "latency_ms" in data
+    assert data.get("serving_backend") == "local"
+    assert data.get("model_version") is not None
 
 
 def test_empty_or_invalid_input_handling():

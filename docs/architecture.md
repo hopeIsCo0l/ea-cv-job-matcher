@@ -30,6 +30,11 @@
 4. Run quality gates and emit distribution + quality reports.
 5. Run baseline evaluation and export eval-ready summary artifacts.
 
+## Phase 5 Serving (runtime)
+- Scoring is orchestrated in `src/runtime/score_service.py`: local TF-IDF by default, optional HTTP forward to `REMOTE_SCORER_URL`, rollout modes (`production`, `shadow`, `canary`, `percentage`), and fallback per `FALLBACK_ON_ERROR`.
+- Production **`model_id` / `model_version` / `scorer_source`** are read from `registry/` via `src/runtime/registry_meta.py`.
+- Structured logs include `request_id`, `scorer_source`, `latency_ms`, `serving_backend`, `rollout_mode`, `model_version`.
+
 ## Phase 4 Registry (governance)
 - Models live in states **candidate**, **staging**, **production**; transitions are manual and recorded in `registry/registry.json` and per-model JSON cards.
 - Promotion requires metrics vs baseline, fairness spread across CV buckets (see `config/promotion_criteria.json`), and **approval metadata** (actor, timestamp, reason).

@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class JobInput(BaseModel):
@@ -30,8 +30,15 @@ class ExcludedJob(BaseModel):
 
 
 class ScoreResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     request_id: str
     scorer_source: str
     ranked_results: List[RankedResult]
     excluded_jobs: List[ExcludedJob]
     latency_ms: float
+    model_id: str | None = None
+    model_version: str | None = None
+    rollout_mode: str | None = None
+    serving_backend: str | None = None
+    fallback_reason: str | None = None

@@ -25,7 +25,12 @@ If AI service is unavailable or times out, caller should return neutral response
 ## Versioning Strategy
 - Path-versioned API (`/v1/score`, future `/v2/score`).
 - `scorer_source` identifies model/scoring implementation lineage.
+- **`model_version`** and **`model_id`** (Phase 5) tie responses to `registry/`; clients may log them for audit.
 - Keep contract backward compatible within same `v1` path.
+
+## Phase 5 (same service)
+- Readiness: `GET /ready` returns `model_version`, `rollout_mode`, `serving_backend`, and registry path metadata.
+- If this process forwards to another scorer (`REMOTE_SCORER_URL`), timeouts apply; on failure it may return **`scorer_source=fallback_unavailable`** when `FALLBACK_ON_ERROR=true` (see `docs/deployment-guide.md`).
 
 ## Example Request
 ```json

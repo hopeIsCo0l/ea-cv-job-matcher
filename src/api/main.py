@@ -1,4 +1,6 @@
+import logging
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -6,6 +8,19 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.api.routes import router
+from src.config.serving import load_serving_config
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI):
+    cfg = load_serving_config()
+    level = getattr(logging, cfg.log_level, logging.INFO)
+    logging.basicConfig(
+        level=level,
+        format="%(levelname)s %(name)s %(message)s",
+        force=True,
+    )
+    yield
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
@@ -16,7 +31,11 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         return response
 
 
-app = FastAPI(title="Ethiopian Airlines CV Similarity API", version="1.0.0")
+app = FastAPI(
+    title="Ethiopian Airlines CV Similarity API",
+    version="1.0.0",
+    lifespan=_lifespan,
+)
 app.add_middleware(RequestIdMiddleware)
 app.include_router(router)
 
