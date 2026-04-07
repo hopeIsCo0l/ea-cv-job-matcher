@@ -1,0 +1,313 @@
+{
+  "$defs": {
+    "ApprovalRecord": {
+      "description": "Who moved a model, when, and why (audit trail).",
+      "properties": {
+        "action": {
+          "description": "e.g. promote_to_staging, promote_to_production, demote_to_candidate",
+          "title": "Action",
+          "type": "string"
+        },
+        "actor": {
+          "description": "Identifier: email, service account, or role",
+          "title": "Actor",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "ticket": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Issue/PR/ticket reference",
+          "title": "Ticket"
+        }
+      },
+      "required": [
+        "action",
+        "actor",
+        "reason"
+      ],
+      "title": "ApprovalRecord",
+      "type": "object"
+    },
+    "EvaluationMetrics": {
+      "properties": {
+        "top1_accuracy": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top1 Accuracy"
+        },
+        "top3_hit_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top3 Hit Rate"
+        },
+        "mrr": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mrr"
+        },
+        "pair_accuracy": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pair Accuracy"
+        },
+        "eval_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. phase3_comparison.json, phase2_full_eval",
+          "title": "Eval Source"
+        }
+      },
+      "title": "EvaluationMetrics",
+      "type": "object"
+    },
+    "FairnessReport": {
+      "description": "Fairness-style checks on synthetic CV buckets (Phase 2/3 eval).",
+      "properties": {
+        "cv_bucket_top1": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Top-1 accuracy per match_bucket (high/medium/low) if computed",
+          "title": "Cv Bucket Top1"
+        },
+        "cv_bucket_top1_spread": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "max(top1) - min(top1) across buckets",
+          "title": "Cv Bucket Top1 Spread"
+        },
+        "insufficient_bucket_behavior": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "fail | warn_only | not_applicable_exempt (see config/promotion_criteria.json)",
+          "title": "Insufficient Bucket Behavior"
+        },
+        "gates_passed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gates Passed"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "title": "FairnessReport",
+      "type": "object"
+    },
+    "RegistryState": {
+      "enum": [
+        "candidate",
+        "staging",
+        "production"
+      ],
+      "title": "RegistryState",
+      "type": "string"
+    }
+  },
+  "description": "Machine-readable model card (promotion + audit).\nSerialized to JSON; validate with registry/model_card.schema.json.",
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "model_id": {
+      "title": "Model Id",
+      "type": "string"
+    },
+    "display_name": {
+      "title": "Display Name",
+      "type": "string"
+    },
+    "registry_state": {
+      "$ref": "#/$defs/RegistryState"
+    },
+    "scorer_source": {
+      "title": "Scorer Source",
+      "type": "string"
+    },
+    "model_type": {
+      "description": "e.g. tfidf_cosine, logistic_regression_tfidf",
+      "title": "Model Type",
+      "type": "string"
+    },
+    "artifact_uri": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Path, URL, or object-store URI to serialized model",
+      "title": "Artifact Uri"
+    },
+    "training": {
+      "additionalProperties": true,
+      "title": "Training",
+      "type": "object"
+    },
+    "evaluation": {
+      "$ref": "#/$defs/EvaluationMetrics"
+    },
+    "fairness": {
+      "$ref": "#/$defs/FairnessReport"
+    },
+    "promotion_criteria_version": {
+      "default": "1",
+      "description": "Must match config/promotion_criteria.json version",
+      "title": "Promotion Criteria Version",
+      "type": "string"
+    },
+    "gates_satisfied": {
+      "default": false,
+      "title": "Gates Satisfied",
+      "type": "boolean"
+    },
+    "approvals": {
+      "items": {
+        "$ref": "#/$defs/ApprovalRecord"
+      },
+      "title": "Approvals",
+      "type": "array"
+    },
+    "risks": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Risks"
+    },
+    "intended_use": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Intended Use"
+    },
+    "limitations": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Limitations"
+    }
+  },
+  "required": [
+    "model_id",
+    "display_name",
+    "registry_state",
+    "scorer_source",
+    "model_type"
+  ],
+  "title": "ModelCard",
+  "type": "object"
+}

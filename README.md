@@ -93,6 +93,14 @@ curl -X POST "http://localhost:8000/v1/score" \
 - Locked criteria are documented in `docs/phase3-promotion-criteria.md`.
 - Baseline freeze reference lives in `artifacts/phase2_baseline_reference.json`.
 
+### Phase 4 — registry + promotion gate
+- **States:** `candidate` → `staging` → `production` (see `docs/phase4-registry.md`).
+- **Promotion criteria (machine-readable):** `config/promotion_criteria.json` (**v2** — separate **Phase 2 full-dataset** vs **Phase 3 same-split** baseline axes; do not mix).
+- **Human checklist:** `docs/phase4-promotion-checklist.md`.
+- **Registry index:** `registry/registry.json` (includes approval **who / when / why** per transition).
+- **Model cards:** `registry/model_cards/*.json` — schema: `registry/model_card.schema.json`.
+- **Validate:** `python scripts/validate_registry.py`
+
 ## Phase 3 roadmap (not implemented)
 - Collect real labeled hiring outcomes and human ranking judgments
 - Train and compare transformer/reranker models

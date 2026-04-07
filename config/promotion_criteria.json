@@ -1,0 +1,71 @@
+{
+  "version": "2",
+  "description": "Phase 4 promotion gates. Ranking rules are split by baseline axis — do not mix metrics from different axes in a single promotion decision.",
+  "baseline_axes": {
+    "phase2_full_dataset": {
+      "id": "phase2_full_dataset",
+      "label": "Frozen Phase 2 (full dataset)",
+      "baseline_metrics_artifact": "artifacts/phase2_baseline_reference.json",
+      "what_it_measures": "TF-IDF cosine ranking on all CVs in dataset_v1 (no train/test split).",
+      "use_when": "Reporting end-to-end baseline parity with Phase 2 eval artifacts.",
+      "do_not_compare_to": ["phase3_same_split"],
+      "note": "Numbers here are NOT comparable to Phase 3 same-split rows (different CVs in the metric)."
+    },
+    "phase3_same_split": {
+      "id": "phase3_same_split",
+      "label": "Phase 3 (stratified CV train/test split)",
+      "baseline_metrics_source": "artifacts/phase3_comparison.json",
+      "baseline_row_model_name": "tfidf_cosine_baseline",
+      "what_it_measures": "TF-IDF vs learners on the same held-out test CVs (apples-to-apples for model comparison).",
+      "use_when": "Promoting or comparing trained candidates (LR, SVM, boosting) against TF-IDF on the same split.",
+      "do_not_compare_to": ["phase2_full_dataset"],
+      "note": "Use the tfidf_cosine_baseline row only — not Phase 2 JSON — for this axis."
+    }
+  },
+  "ranking_gates": {
+    "promotion_must_declare_baseline_axis": true,
+    "allowed_axes": ["phase2_full_dataset", "phase3_same_split"],
+    "when_using_axis_phase2_full_dataset": {
+      "baseline_axis": "phase2_full_dataset",
+      "compare_candidate_metrics_to": "artifacts/phase2_baseline_reference.json",
+      "top1_min_delta_vs_baseline": 0.05,
+      "top3_must_not_drop_below_baseline": true,
+      "mrr_must_exceed_baseline": true
+    },
+    "when_using_axis_phase3_same_split": {
+      "baseline_axis": "phase3_same_split",
+      "compare_candidate_metrics_to": "artifacts/phase3_comparison.json results[].model_name == tfidf_cosine_baseline",
+      "top1_min_delta_vs_baseline": 0.05,
+      "top3_must_not_drop_below_baseline": true,
+      "mrr_must_exceed_baseline": true
+    }
+  },
+  "fairness_gates": {
+    "cv_bucket_top1_max_spread": 0.2,
+    "description": "On the evaluation set, Top-1 (or agreed metric) spread across CV match buckets (high / medium / low): max(bucket) - min(bucket).",
+    "min_eval_samples_per_bucket": 15,
+    "insufficient_bucket_samples": {
+      "default_behavior": "fail",
+      "allowed_behaviors": {
+        "fail": {
+          "meaning": "Block promotion to staging or production until each bucket meets min_eval_samples_per_bucket or eval is rerun with more data.",
+          "use_when": "Default; thesis / governance evidence requires complete bucket coverage."
+        },
+        "warn_only": {
+          "meaning": "Promotion may proceed if spread is computed on available buckets only; document which bucket(s) are under-sampled in the model card and approval reason.",
+          "use_when": "Exploratory staging; not for production without explicit sign-off."
+        },
+        "not_applicable_exempt": {
+          "meaning": "Fairness spread gate skipped for this promotion (e.g. diagnostic run). Record N/A on model card with ticket and approver.",
+          "use_when": "Temporary exemption approved in writing (ticket + actor)."
+        }
+      },
+      "select_behavior_in": "model_card.fairness.insufficient_bucket_behavior and approval reason"
+    }
+  },
+  "quality_gates": [
+    "Phase 2 dataset quality gates pass for dataset_version in use",
+    "No regression on required API contract tests",
+    "Inference latency within org budget (define per deployment)"
+  ]
+}

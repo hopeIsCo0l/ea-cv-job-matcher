@@ -25,3 +25,6 @@ These gates are locked before training/model comparison to avoid moving goalpost
 - Run `python scripts/run_phase3_comparison.py` after `dataset_v1` exists.
 - **Apples-to-apples baseline** for promotion on that run is the `tfidf_cosine_baseline` row in `artifacts/phase3_comparison.json` (same stratified CV split as candidates).
 - Frozen Phase 2 numbers in `phase2_baseline_reference.json` are **full-dataset** TF-IDF metrics; they are a historical snapshot, not the same split as Phase 3.
+
+## Phase 4 alignment
+- Full rules and **baseline axis IDs** (`phase2_full_dataset` vs `phase3_same_split`) live in `config/promotion_criteria.json` **version 2**. Use the axis that matches your eval table — never mix the two in one promotion decision.

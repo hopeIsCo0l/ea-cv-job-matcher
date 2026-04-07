@@ -6,6 +6,9 @@
 - `src/data`: Request/response schemas.
 - `src/evaluation`: Synthetic dataset definitions, quality gates, and evaluation metrics.
 - `scripts`: Deterministic dataset/version builders and evaluation runners.
+- `src/registry`: Phase 4 Pydantic schemas for model cards and registry entries (validation only; no runtime API yet).
+- `config/promotion_criteria.json`: Versioned promotion gates (ranking + fairness).
+- `registry/`: Model registry index (`registry.json`), machine-readable model cards (`model_cards/`), JSON Schema (`model_card.schema.json`).
 
 ## Request Flow
 1. API validates payload and assigns `request_id`.
@@ -26,6 +29,10 @@
 3. Expand to 1600 `(cv, job)` rows with `expected_label` and `expected_rank`.
 4. Run quality gates and emit distribution + quality reports.
 5. Run baseline evaluation and export eval-ready summary artifacts.
+
+## Phase 4 Registry (governance)
+- Models live in states **candidate**, **staging**, **production**; transitions are manual and recorded in `registry/registry.json` and per-model JSON cards.
+- Promotion requires metrics vs baseline, fairness spread across CV buckets (see `config/promotion_criteria.json`), and **approval metadata** (actor, timestamp, reason).
 
 ## Non-Goals in Phase 1 and 2
 - No model training/fine-tuning.

@@ -1,0 +1,22 @@
+{
+  "registry_version": "1",
+  "updated_at": "2026-04-07T00:00:00Z",
+  "promotion_criteria_path": "config/promotion_criteria.json",
+  "models": [
+    {
+      "model_id": "baseline_tfidf_cosine_v1",
+      "state": "production",
+      "model_card_path": "registry/model_cards/baseline_tfidf_v1.json",
+      "current_version_tag": "v1.0.0-phase1-baseline",
+      "history": [
+        {
+          "action": "promote_to_production",
+          "actor": "system@initial-seed",
+          "timestamp": "2026-04-07T00:00:00Z",
+          "reason": "Initial registry seed: Phase 1 TF-IDF cosine baseline shipped as production scorer.",
+          "ticket": null
+        }
+      ]
+    }
+  ]
+}

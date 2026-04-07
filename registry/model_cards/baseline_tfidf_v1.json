@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "model_id": "baseline_tfidf_cosine_v1",
+  "display_name": "TF-IDF cosine baseline (Ethiopian Airlines 8-role scope)",
+  "registry_state": "production",
+  "scorer_source": "baseline_tfidf_cosine_v1",
+  "model_type": "tfidf_cosine",
+  "artifact_uri": null,
+  "training": {
+    "dataset_version": "v1",
+    "dataset_sha256": "f70476a245f7b130cde9317b3ec5c427077b680914d4858d30367ba01a717a95",
+    "tfidf": {
+      "ngram_range": [1, 2],
+      "max_features": 5000,
+      "stop_words": "english",
+      "sublinear_tf": true
+    },
+    "notes": "No offline training; vectorizer fit per request on shared corpus [cv] + jobs."
+  },
+  "evaluation": {
+    "top1_accuracy": 0.61,
+    "top3_hit_rate": 0.82,
+    "mrr": 0.7329,
+    "pair_accuracy": null,
+    "eval_source": "artifacts/phase2_baseline_reference.json (full-dataset eval); baseline_axis=phase2_full_dataset"
+  },
+  "fairness": {
+    "cv_bucket_top1": null,
+    "cv_bucket_top1_spread": null,
+    "insufficient_bucket_behavior": null,
+    "gates_passed": null,
+    "notes": "Per-bucket Top-1 to be filled when running stratified eval; under-sample behavior: see config/promotion_criteria.json fairness_gates.insufficient_bucket_samples"
+  },
+  "promotion_criteria_version": "2",
+  "gates_satisfied": true,
+  "approvals": [
+    {
+      "action": "promote_to_production",
+      "actor": "system@initial-seed",
+      "timestamp": "2026-04-07T00:00:00Z",
+      "reason": "Registry bootstrap; baseline is current production behavior.",
+      "ticket": null
+    }
+  ],
+  "risks": "Lexical overlap only; may miss semantic matches or multilingual CVs.",
+  "intended_use": "Rank Ethiopian Airlines trainee roles for a single CV against up to 8 job descriptions.",
+  "limitations": "Not trained on live hiring outcomes; labels on synthetic data are heuristic."
+}
