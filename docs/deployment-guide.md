@@ -60,6 +60,22 @@ Emit **`X-Request-ID`** on responses (middleware).
 2. Set `ROLLOUT_MODE=canary`, `CANARY_PERCENT=5`, `REMOTE_SCORER_URL=http://baseline:8000`, `CANDIDATE_REMOTE_SCORER_URL=http://candidate:8000` (example).
 3. Monitor logs and error rates; increase `CANARY_PERCENT` gradually or switch to `SERVING_BACKEND=remote` for full cutover.
 
+## Registry in the container (bake vs mount)
+
+The **Dockerfile** copies `registry/` and `config/` into the image so **`GET /ready`** and runtime metadata match what you committed.
+
+| Approach | When to use |
+| --- | --- |
+| **Bake in (default)** | Rebuild and redeploy the image after every registry/model-card promotion so production matches git. |
+| **Bind-mount** | Mount `registry/` (and optionally `config/`) read-only at runtime, e.g. `volumes: - ./registry:/app/registry:ro` — use when ops updates registry without rebuild (document who can change files). |
+
+**After any Phase 4 promotion**, either rebuild the image or update the mounted files, then verify with `python scripts/validate_registry.py` in CI or locally.
+
+## Contract parity (local / remote / fallback)
+
+- Successful **local** and **remote** paths return the **same top-level JSON keys** (`model_id`, `model_version`, `rollout_mode`, `serving_backend`, `fallback_reason`, …).
+- When **`scorer_source` is `fallback_unavailable`**, **`fallback_reason`** is always a **non-empty** string (error message or exception type) so clients can tell **degraded** vs normal scoring.
+
 ## Files
 
 - `src/config/serving.py` — env parsing and effective remote URL.

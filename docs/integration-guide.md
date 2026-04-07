@@ -3,7 +3,16 @@
 ## Endpoint
 - Base URL: `http://<host>:8000`
 - Score API: `POST /v1/score`
-- Auth: add gateway/API-key in front of this service (placeholder for now).
+
+## Authentication and secrets
+
+This service does **not** embed API keys. For production:
+
+- Terminate TLS and authenticate at the **gateway** (API gateway, reverse proxy, or your recruitment app) using API keys, JWT, or mTLS.
+- Pass **`X-Request-ID`** from the client or generate one at the edge; the API echoes it on responses.
+- Store **`REMOTE_SCORER_URL`** and any gateway credentials in a **secret manager** or orchestrator secrets — **not** in `docker-compose.yml` in source control.
+
+Student / dev setups may run open on `localhost`; document any shared demo URL separately.
 
 ## Recommended Client Behavior
 - Timeout: 3-5 seconds.
@@ -18,9 +27,12 @@ If AI service is unavailable or times out, caller should return neutral response
   "scorer_source": "fallback_unavailable",
   "ranked_results": [],
   "excluded_jobs": [],
-  "latency_ms": 0
+  "latency_ms": 0,
+  "fallback_reason": "timeout_or_upstream_error"
 }
 ```
+
+When using **this** service with `FALLBACK_ON_ERROR=true`, the API sets **`fallback_reason`** to the actual error message (always non-empty).
 
 ## Versioning Strategy
 - Path-versioned API (`/v1/score`, future `/v2/score`).
@@ -31,6 +43,13 @@ If AI service is unavailable or times out, caller should return neutral response
 ## Phase 5 (same service)
 - Readiness: `GET /ready` returns `model_version`, `rollout_mode`, `serving_backend`, and registry path metadata.
 - If this process forwards to another scorer (`REMOTE_SCORER_URL`), timeouts apply; on failure it may return **`scorer_source=fallback_unavailable`** when `FALLBACK_ON_ERROR=true` (see `docs/deployment-guide.md`).
+- When **`fallback_unavailable`**, **`fallback_reason`** is always set to a non-empty string so callers can detect the degraded path.
+
+## Phase 6 — recruitment app (e.g. fypimp103)
+
+- Point the main app at this service: **`REMOTE_SCORER_URL`**, client timeouts, and propagate **`request_id`** end-to-end if used for tracing.
+- Track **remote error rate**, **p95 latency**, and **fallback rate** (logs or a small dashboard).
+- On each release tag: re-run **`python scripts/run_phase3_comparison.py`** and **`python scripts/validate_registry.py`** (see `docs/phase6-roadmap.md`).
 
 ## Example Request
 ```json

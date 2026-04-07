@@ -22,6 +22,39 @@ logger = logging.getLogger(__name__)
 _scorer = TfidfScorer()
 
 
+def _format_fallback_reason(exc: Exception) -> str:
+    """Non-empty string for clients and logs when scorer_source is fallback_unavailable."""
+    s = str(exc).strip()
+    return s if s else type(exc).__name__
+
+
+def _score_envelope(
+    *,
+    request_id: str,
+    scorer_source: str,
+    ranked_results: list[dict[str, Any]],
+    excluded_jobs: list[dict[str, Any]],
+    latency_ms: float,
+    meta: dict[str, Any],
+    cfg: ServingConfig,
+    serving_backend: str,
+    fallback_reason: str | None,
+) -> dict[str, Any]:
+    """Single response shape for local, remote, and fallback (contract parity)."""
+    return {
+        "request_id": request_id,
+        "scorer_source": scorer_source,
+        "ranked_results": ranked_results,
+        "excluded_jobs": excluded_jobs,
+        "latency_ms": latency_ms,
+        "model_id": meta.get("model_id"),
+        "model_version": meta.get("model_version"),
+        "rollout_mode": cfg.rollout_mode,
+        "serving_backend": serving_backend,
+        "fallback_reason": fallback_reason,
+    }
+
+
 def _local_score(
     payload: ScoreRequest,
     request_id: str,
@@ -40,43 +73,54 @@ def _local_score(
     ranked = ranked[:top_k]
     latency_ms = round((time.perf_counter() - started) * 1000, 3)
 
-    return _build_response(
+    return _score_envelope(
         request_id=request_id,
-        ranked=ranked,
-        excluded=excluded,
+        scorer_source=meta.get("scorer_source", SCORER_SOURCE),
+        ranked_results=ranked,
+        excluded_jobs=excluded,
         latency_ms=latency_ms,
         meta=meta,
         cfg=cfg,
         serving_backend="local",
-        scorer_source_override=meta.get("scorer_source", SCORER_SOURCE),
         fallback_reason=None,
     )
 
 
-def _build_response(
+def _merge_remote_response(
+    remote: dict[str, Any],
     *,
     request_id: str,
-    ranked: list[dict[str, Any]],
-    excluded: list[dict[str, Any]],
-    latency_ms: float,
     meta: dict[str, Any],
     cfg: ServingConfig,
-    serving_backend: str,
-    scorer_source_override: str,
-    fallback_reason: str | None,
+    latency_ms: float,
 ) -> dict[str, Any]:
-    return {
-        "request_id": request_id,
-        "scorer_source": scorer_source_override,
-        "ranked_results": ranked,
-        "excluded_jobs": excluded,
-        "latency_ms": latency_ms,
-        "model_id": meta.get("model_id"),
-        "model_version": meta.get("model_version"),
-        "rollout_mode": cfg.rollout_mode,
-        "serving_backend": serving_backend,
-        "fallback_reason": fallback_reason,
-    }
+    """Normalize remote JSON to the same envelope as local scoring."""
+    rid = remote.get("request_id") or request_id
+    ranked = remote.get("ranked_results")
+    if not isinstance(ranked, list):
+        ranked = []
+    excluded = remote.get("excluded_jobs")
+    if not isinstance(excluded, list):
+        excluded = []
+    lm = remote.get("latency_ms", latency_ms)
+    try:
+        lm_f = float(lm)
+    except (TypeError, ValueError):
+        lm_f = float(latency_ms)
+    return _score_envelope(
+        request_id=str(rid),
+        scorer_source=str(remote.get("scorer_source", meta.get("scorer_source", SCORER_SOURCE))),
+        ranked_results=ranked,
+        excluded_jobs=excluded,
+        latency_ms=lm_f,
+        meta={
+            "model_id": remote.get("model_id", meta.get("model_id")),
+            "model_version": remote.get("model_version", meta.get("model_version")),
+        },
+        cfg=cfg,
+        serving_backend="remote",
+        fallback_reason=None,
+    )
 
 
 def execute_score(request_id: str, payload: ScoreRequest) -> dict[str, Any]:
@@ -95,18 +139,13 @@ def execute_score(request_id: str, payload: ScoreRequest) -> dict[str, Any]:
         try:
             remote = forward_score(remote_url, body, cfg.remote_timeout_seconds)
             latency_ms = round((time.perf_counter() - started) * 1000, 3)
-            return {
-                "request_id": remote.get("request_id", request_id),
-                "scorer_source": remote.get("scorer_source", meta.get("scorer_source", SCORER_SOURCE)),
-                "ranked_results": remote.get("ranked_results", []),
-                "excluded_jobs": remote.get("excluded_jobs", []),
-                "latency_ms": remote.get("latency_ms", latency_ms),
-                "model_id": remote.get("model_id", meta.get("model_id")),
-                "model_version": remote.get("model_version", meta.get("model_version")),
-                "rollout_mode": cfg.rollout_mode,
-                "serving_backend": "remote",
-                "fallback_reason": None,
-            }
+            return _merge_remote_response(
+                remote,
+                request_id=request_id,
+                meta=meta,
+                cfg=cfg,
+                latency_ms=latency_ms,
+            )
         except Exception as exc:
             logger.warning(
                 "remote_scorer_failed",
@@ -118,18 +157,18 @@ def execute_score(request_id: str, payload: ScoreRequest) -> dict[str, Any]:
             )
             if cfg.fallback_on_error:
                 latency_ms = round((time.perf_counter() - started) * 1000, 3)
-                return {
-                    "request_id": request_id,
-                    "scorer_source": "fallback_unavailable",
-                    "ranked_results": [],
-                    "excluded_jobs": [],
-                    "latency_ms": latency_ms,
-                    "model_id": meta.get("model_id"),
-                    "model_version": meta.get("model_version"),
-                    "rollout_mode": cfg.rollout_mode,
-                    "serving_backend": "fallback",
-                    "fallback_reason": str(exc),
-                }
+                reason = _format_fallback_reason(exc)
+                return _score_envelope(
+                    request_id=request_id,
+                    scorer_source="fallback_unavailable",
+                    ranked_results=[],
+                    excluded_jobs=[],
+                    latency_ms=latency_ms,
+                    meta=meta,
+                    cfg=cfg,
+                    serving_backend="fallback",
+                    fallback_reason=reason,
+                )
             raise
 
     return _local_score(
@@ -142,14 +181,14 @@ def execute_score(request_id: str, payload: ScoreRequest) -> dict[str, Any]:
 
 
 def log_score_completion(request_id: str, result: dict[str, Any]) -> None:
-    logger.info(
-        "score_completed",
-        extra={
-            "request_id": request_id,
-            "scorer_source": result.get("scorer_source"),
-            "latency_ms": result.get("latency_ms"),
-            "serving_backend": result.get("serving_backend"),
-            "rollout_mode": result.get("rollout_mode"),
-            "model_version": result.get("model_version"),
-        },
-    )
+    extra: dict[str, Any] = {
+        "request_id": request_id,
+        "scorer_source": result.get("scorer_source"),
+        "latency_ms": result.get("latency_ms"),
+        "serving_backend": result.get("serving_backend"),
+        "rollout_mode": result.get("rollout_mode"),
+        "model_version": result.get("model_version"),
+    }
+    if result.get("fallback_reason"):
+        extra["fallback_reason"] = result.get("fallback_reason")
+    logger.info("score_completed", extra=extra)

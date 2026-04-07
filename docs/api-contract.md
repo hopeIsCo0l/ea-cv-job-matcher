@@ -59,7 +59,7 @@
 }
 ```
 
-Optional fields may be `null`. When remote scoring fails and fallback applies, `scorer_source` may be `fallback_unavailable`, `ranked_results` empty, and `fallback_reason` set (Phase 5).
+Optional fields may be `null`. When remote scoring fails and fallback applies, `scorer_source` is `fallback_unavailable`, `ranked_results` is empty, and **`fallback_reason` is always a non-empty string** (Phase 5) so clients can distinguish degraded responses from normal scoring.
 
 ### Error Response
 ```json

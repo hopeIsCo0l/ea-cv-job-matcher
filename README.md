@@ -107,6 +107,9 @@ curl -X POST "http://localhost:8000/v1/score" \
 - **Observability:** logs `request_id`, `scorer_source`, `latency_ms`, rollout fields (Phase 6 can add dashboards).
 - **Docs:** `docs/deployment-guide.md`, `docs/rollback-runbook.md`, `docs/sla-slo.md`.
 
+### Phase 6 (integration + monitoring)
+- See `docs/phase6-roadmap.md` and **Phase 6** in `docs/integration-guide.md` (recruitment app, `request_id`, regression checks).
+
 ## Phase 3 roadmap (not implemented)
 - Collect real labeled hiring outcomes and human ranking judgments
 - Train and compare transformer/reranker models
