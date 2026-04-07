@@ -1,0 +1,66 @@
+{
+  "dataset": "C:\\Users\\abdel\\Documents\\cd\\data\\processed\\dataset_v1.jsonl",
+  "tfidf_config": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "max_features": 5000,
+    "stop_words": "english",
+    "sublinear_tf": true
+  },
+  "results": [
+    {
+      "model_name": "tfidf_cosine_baseline",
+      "top1_accuracy": 0.625,
+      "top3_hit_rate": 0.825,
+      "mrr": 0.7446,
+      "inference_latency_ms_median": 2.0784,
+      "artifact_size_bytes": 0,
+      "notes": "Shared-corpus TF-IDF in process; no separate model file"
+    },
+    {
+      "model_name": "logistic_regression",
+      "top1_accuracy": 0.05,
+      "top3_hit_rate": 0.55,
+      "mrr": 0.3403,
+      "pair_accuracy_on_test_rows": 0.5563,
+      "inference_latency_ms_median": 0.538,
+      "artifact_size_bytes": 57222
+    },
+    {
+      "model_name": "linear_svm_sgd_modified_huber",
+      "top1_accuracy": 0.45,
+      "top3_hit_rate": 0.8,
+      "mrr": 0.6383,
+      "pair_accuracy_on_test_rows": 0.8844,
+      "inference_latency_ms_median": 0.5436,
+      "artifact_size_bytes": 57482
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "top1_accuracy": 0.275,
+      "top3_hit_rate": 0.7,
+      "mrr": 0.5015,
+      "pair_accuracy_on_test_rows": 0.8625,
+      "inference_latency_ms_median": 5.117,
+      "artifact_size_bytes": 1138782
+    }
+  ],
+  "promotion": {
+    "baseline_on_this_split": {
+      "top1_accuracy": 0.625,
+      "top3_hit_rate": 0.825,
+      "mrr": 0.7446
+    },
+    "best_candidate": "linear_svm_sgd_modified_huber",
+    "beats_baseline_on_same_split": false,
+    "recommendation": "defer_to_tfidf",
+    "test_split": {
+      "test_size": 0.2,
+      "random_state": 42,
+      "n_train_cvs": 160,
+      "n_test_cvs": 40
+    }
+  }
+}

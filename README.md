@@ -1,4 +1,4 @@
-# Ethiopian Airlines CV-to-Job Similarity (Phase 1)
+# Ethiopian Airlines CV-to-Job Similarity
 
 Production-ready baseline AI service for matching one CV to Ethiopian Airlines jobs using **TF-IDF + cosine similarity**.
 
@@ -32,11 +32,22 @@ uvicorn src.api.main:app --host 0.0.0.0 --port 8000
 pytest
 ```
 
-### 4) Run evaluation
+### 4) Run Phase 1 evaluation
 ```bash
 python scripts/generate_synthetic_data.py
 python scripts/run_evaluation.py
 ```
+
+### 5) Run Phase 2 data and quality pipeline
+```bash
+python scripts/run_phase2_pipeline.py
+```
+
+### 6) Phase 3 — train candidates vs same TF-IDF features (comparison table)
+```bash
+python scripts/run_phase3_comparison.py
+```
+See `docs/phase3-training-plan.md`. Outputs: `artifacts/phase3_comparison_table.md`, `artifacts/phase3_comparison.json`, `artifacts/phase3_models/`.
 
 ## One-command local run (Docker)
 ```bash
@@ -71,8 +82,18 @@ curl -X POST "http://localhost:8000/v1/score" \
 - `artifacts/eval_results.json`
 - `artifacts/eval_summary.md`
 - `artifacts/eval_per_sample.csv`
+- `data/processed/dataset_v1.jsonl`
+- `artifacts/data_quality_report.md`
+- `artifacts/data_distribution.json`
+- `artifacts/eval_ready_summary.md`
+- `artifacts/phase2_baseline_reference.json`
+- `artifacts/phase3_comparison.json` / `artifacts/phase3_comparison_table.md` (after Phase 3 script)
 
-## Phase 2 roadmap (not implemented)
+## Phase 3 promotion criteria
+- Locked criteria are documented in `docs/phase3-promotion-criteria.md`.
+- Baseline freeze reference lives in `artifacts/phase2_baseline_reference.json`.
+
+## Phase 3 roadmap (not implemented)
 - Collect real labeled hiring outcomes and human ranking judgments
 - Train and compare transformer/reranker models
 - Introduce multilingual handling (Amharic/English blending)

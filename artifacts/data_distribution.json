@@ -1,0 +1,36 @@
+{
+  "dataset_version": "v1",
+  "cv_bucket_targets": {
+    "high": 70,
+    "medium": 70,
+    "low": 60
+  },
+  "actual_cv_count": 200,
+  "actual_pair_count": 1600,
+  "jobs_in_scope": [
+    "et-pilot-001",
+    "et-cabin-001",
+    "et-mech-001",
+    "et-avionics-001",
+    "et-power-001",
+    "et-ground-001",
+    "et-cs-001",
+    "et-finance-001"
+  ],
+  "quality_stats": {
+    "rows": 1600,
+    "unique_cv_ids": 200,
+    "unique_jobs": 8,
+    "label_counts": {
+      "good": 70,
+      "medium": 350,
+      "bad": 1180
+    },
+    "bucket_counts": {
+      "high": 560,
+      "medium": 560,
+      "low": 480
+    }
+  },
+  "dataset_sha256": "f70476a245f7b130cde9317b3ec5c427077b680914d4858d30367ba01a717a95"
+}

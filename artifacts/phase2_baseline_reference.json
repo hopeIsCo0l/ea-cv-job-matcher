@@ -1,0 +1,24 @@
+{
+  "baseline_name": "phase2_tfidf_reference",
+  "dataset_version": "v1",
+  "dataset_sha256": "f70476a245f7b130cde9317b3ec5c427077b680914d4858d30367ba01a717a95",
+  "scorer_source": "baseline_tfidf_cosine_v1",
+  "tfidf_config": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "max_features": 5000,
+    "stop_words": "english",
+    "sublinear_tf": true
+  },
+  "thresholds": {
+    "good": 0.4,
+    "medium": 0.2
+  },
+  "metrics": {
+    "top1_accuracy": 0.61,
+    "top3_hit_rate": 0.82,
+    "mrr": 0.7329
+  }
+}

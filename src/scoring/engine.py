@@ -4,6 +4,12 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from src.config.settings import (
+    TFIDF_MAX_FEATURES,
+    TFIDF_NGRAM_RANGE,
+    TFIDF_STOP_WORDS,
+    TFIDF_SUBLINEAR_TF,
+)
 from src.data.schemas import JobInput
 from src.scoring.labels import label_from_score
 from src.scoring.text_utils import normalize_text
@@ -12,10 +18,10 @@ from src.scoring.text_utils import normalize_text
 class TfidfScorer:
     def __init__(
         self,
-        ngram_range: tuple[int, int] = (1, 2),
-        max_features: int = 5000,
-        stop_words: str | None = "english",
-        sublinear_tf: bool = True,
+        ngram_range: tuple[int, int] = TFIDF_NGRAM_RANGE,
+        max_features: int = TFIDF_MAX_FEATURES,
+        stop_words: str | None = TFIDF_STOP_WORDS,
+        sublinear_tf: bool = TFIDF_SUBLINEAR_TF,
     ) -> None:
         self.vectorizer = TfidfVectorizer(
             ngram_range=ngram_range,
