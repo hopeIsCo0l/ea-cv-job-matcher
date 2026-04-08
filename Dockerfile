@@ -2,13 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+ENV PIP_DEFAULT_TIMEOUT=120
+
 COPY pyproject.toml README.md /app/
 COPY src /app/src
 COPY scripts /app/scripts
 COPY registry /app/registry
 COPY config /app/config
 
-RUN pip install --no-cache-dir .
+RUN python -m pip install --no-cache-dir .
 
 EXPOSE 8000
 
