@@ -24,7 +24,7 @@ pip install -e .[dev]
 
 ### 2) Run API
 ```bash
-uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+uvicorn src.api.main:app --host 0.0.0.0 --port 80000
 ```
 
 ### 3) Run tests
